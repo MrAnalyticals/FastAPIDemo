@@ -5,9 +5,6 @@ from typing import Optional, List
 from . import models, schemas, crud
 from .database import SessionLocal, engine, Base, test_connection
 
-# Create database tables
-Base.metadata.create_all(bind=engine)
-
 # Initialize FastAPI app
 app = FastAPI(
     title="Energy Trading Platform",
@@ -17,8 +14,24 @@ app = FastAPI(
     redoc_url="/redoc"
 )
 
+# Create database tables on first request instead of startup
+tables_created = False
+
+def ensure_tables_exist():
+    """Ensure database tables exist, with retry logic"""
+    global tables_created
+    if not tables_created:
+        try:
+            Base.metadata.create_all(bind=engine)
+            tables_created = True
+            print("Database tables created successfully")
+        except Exception as e:
+            print(f"Failed to create database tables: {e}")
+            # Don't raise exception, let the app continue and retry later
+
 # Dependency to get database session
 def get_db():
+    ensure_tables_exist()  # Ensure tables exist before each database operation
     db = SessionLocal()
     try:
         yield db
@@ -38,6 +51,7 @@ async def read_root():
 @app.get("/health", response_model=schemas.HealthCheck, summary="Health check")
 async def health_check():
     """Health check endpoint to verify API and database connectivity"""
+    ensure_tables_exist()  # Try to create tables if needed
     db_connected = test_connection()
     
     return schemas.HealthCheck(
