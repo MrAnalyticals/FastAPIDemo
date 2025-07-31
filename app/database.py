@@ -44,11 +44,10 @@ def create_connection_string():
         # Get access token
         access_token = get_access_token()
         
-        # Create connection string with access token
+        # Create connection string with access token (no authentication parameter)
         connection_string = (
             f"mssql+pyodbc://@{server}/{database}"
             "?driver=ODBC+Driver+17+for+SQL+Server"
-            "&Authentication=ActiveDirectoryMsi"
         )
         
         # We'll set the access token in the connection event
