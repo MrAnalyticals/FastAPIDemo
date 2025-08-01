@@ -1,0 +1,33 @@
+=== Database Connection Test - 2025-08-01 02:08:49.176846 ===
+Loading environment variables...
+DATABASE_URL found: True
+DATABASE_URL (first 80 chars): mssql+pyodbc://fastapiadmin:password123%2E@fastapitrading.database.windows.net:1...
+USE_MANAGED_IDENTITY: False
+AZURE_SQL_SERVER: fastapitrading.database.windows.net
+AZURE_SQL_DATABASE: fastapi
+
+Testing imports...
+SQLAlchemy imported successfully
+pyodbc imported successfully
+Available ODBC drivers: ['SQL Server', 'ODBC Driver 17 for SQL Server', 'Microsoft Access Driver (*.mdb, *.accdb)', 'Microsoft Excel Driver (*.xls, *.xlsx, *.xlsm, *.xlsb)', 'Microsoft Access Text Driver (*.txt, *.csv)', 'Microsoft Access dBASE Driver (*.dbf, *.ndx, *.mdx)']
+
+Testing database connection...
+Engine created successfully
+Attempting to connect...
+2025-08-01 02:08:51,336 INFO sqlalchemy.engine.Engine SELECT CAST(SERVERPROPERTY('ProductVersion') AS VARCHAR)
+2025-08-01 02:08:51,337 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-08-01 02:08:51,452 INFO sqlalchemy.engine.Engine SELECT schema_name()
+2025-08-01 02:08:51,453 INFO sqlalchemy.engine.Engine [generated in 0.00113s] ()
+2025-08-01 02:08:51,687 INFO sqlalchemy.engine.Engine SELECT CAST('test max support' AS NVARCHAR(max))
+2025-08-01 02:08:51,688 INFO sqlalchemy.engine.Engine [generated in 0.00138s] ()
+2025-08-01 02:08:51,762 INFO sqlalchemy.engine.Engine SELECT 1 FROM fn_listextendedproperty(default, default, default, default, default, default, default)
+2025-08-01 02:08:51,766 INFO sqlalchemy.engine.Engine [generated in 0.00435s] ()
+Connection established!
+2025-08-01 02:08:51,968 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2025-08-01 02:08:51,968 INFO sqlalchemy.engine.Engine SELECT 1 as test, GETDATE() as current_datetime
+2025-08-01 02:08:51,969 INFO sqlalchemy.engine.Engine [generated in 0.00122s] ()
+Query executed successfully: (1, datetime.datetime(2025, 8, 1, 1, 8, 52, 373000))
+SUCCESS: Database connection working!
+2025-08-01 02:08:52,052 INFO sqlalchemy.engine.Engine ROLLBACK
+
+=== Test completed at 2025-08-01 02:08:52.129749 ===

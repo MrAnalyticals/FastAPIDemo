@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # FastAPI Energy Trading Platform
 
 A FastAPI-based energy commodities trading platform that connects to Azure SQL Database and runs on Azure App Service.
@@ -76,7 +75,3 @@ az webapp up --name fastapi-energy-trading --resource-group myResourceGroup --ru
 ## License
 
 This project is licensed under the MIT License.
-=======
-# FastAPIDemo
-FASTAPI Demo
->>>>>>> 738cb3a58345126a88fe43216214ca67eb20831a

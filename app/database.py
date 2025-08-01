@@ -38,6 +38,12 @@ def get_access_token():
 def create_connection_string():
     """Create appropriate connection string based on authentication method"""
     
+    # Check for direct DATABASE_URL first (highest priority)
+    database_url = os.getenv("DATABASE_URL")
+    if database_url:
+        print("Using direct DATABASE_URL connection string")
+        return database_url, None
+    
     if use_managed_identity:
         # Managed Identity authentication
         print("Using Azure Managed Identity for database authentication")
