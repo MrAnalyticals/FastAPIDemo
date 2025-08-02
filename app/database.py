@@ -40,8 +40,8 @@ def get_connection_string():
     use_managed_identity = os.getenv("USE_MANAGED_IDENTITY", "false").lower() == "true"
     
     if use_managed_identity:
-        # Use Managed Identity with ODBC Driver 18 (matches Azure Portal format)
-        connection_string = f"mssql+pyodbc://@{server}/{database}?driver=ODBC+Driver+18+for+SQL+Server&Authentication=ActiveDirectoryMsi&Encrypt=yes&TrustServerCertificate=no&Connection+Timeout=30"
+        # Use Managed Identity with ODBC Driver 18 - explicitly disable Integrated Security
+        connection_string = f"mssql+pyodbc://@{server}/{database}?driver=ODBC+Driver+18+for+SQL+Server&Authentication=ActiveDirectoryMsi&Integrated+Security=no&Encrypt=yes&TrustServerCertificate=no&Connection+Timeout=30"
     else:
         # Use username/password with ODBC Driver 18
         username = os.getenv("AZURE_SQL_USERNAME")
