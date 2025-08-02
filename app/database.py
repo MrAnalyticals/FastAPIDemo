@@ -40,13 +40,13 @@ def get_connection_string():
     use_managed_identity = os.getenv("USE_MANAGED_IDENTITY", "false").lower() == "true"
     
     if use_managed_identity:
-        # Use Managed Identity with ActiveDirectoryMsi authentication
-        connection_string = f"mssql+pyodbc://@{server}/{database}?driver=ODBC+Driver+17+for+SQL+Server&Authentication=ActiveDirectoryMsi"
+        # Use Managed Identity with Active Directory Default authentication (matches Azure Portal)
+        connection_string = f"mssql+pyodbc://@{server}/{database}?driver=ODBC+Driver+17+for+SQL+Server&Authentication=ActiveDirectoryDefault&Encrypt=yes&TrustServerCertificate=no"
     else:
-        # Use username/password - NO Access Token
+        # Use username/password
         username = os.getenv("AZURE_SQL_USERNAME")
         password = os.getenv("AZURE_SQL_PASSWORD")
-        connection_string = f"mssql+pyodbc://{username}:{password}@{server}/{database}?driver=ODBC+Driver+17+for+SQL+Server"
+        connection_string = f"mssql+pyodbc://{username}:{password}@{server}/{database}?driver=ODBC+Driver+17+for+SQL+Server&Encrypt=yes&TrustServerCertificate=no"
     
     return connection_string
 
