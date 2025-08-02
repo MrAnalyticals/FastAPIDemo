@@ -64,19 +64,12 @@ class TradeCreate(TradeBase):
     """Schema for creating a new trade with dynamic examples"""
     
     class Config:
-        schema_extra = {
+        json_schema_extra = {
             "examples": [
                 {
-                    "commodity": get_random_commodity(),
-                    "price": get_random_price(get_random_commodity()),
-                    "quantity": get_random_quantity(get_random_commodity()),
-                    "side": get_random_side(),
-                    "trader_id": get_random_trader()
-                },
-                {
                     "commodity": "electricity",
-                    "price": 85.75,
-                    "quantity": 500.0,
+                    "price": 95.75,
+                    "quantity": 750.0,
                     "side": "buy",
                     "trader_id": "energy_corp"
                 },
@@ -88,10 +81,17 @@ class TradeCreate(TradeBase):
                     "trader_id": "fossil_fuel_ltd"
                 },
                 {
+                    "commodity": "gas",
+                    "price": 4.25,
+                    "quantity": 12000.0,
+                    "side": "buy",
+                    "trader_id": "trader_001"
+                },
+                {
                     "commodity": "renewable",
                     "price": 65.25,
-                    "quantity": 750.0,
-                    "side": "buy",
+                    "quantity": 950.0,
+                    "side": "sell",
                     "trader_id": "green_power"
                 }
             ]
