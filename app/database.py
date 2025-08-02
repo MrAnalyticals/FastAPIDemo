@@ -40,10 +40,10 @@ def get_connection_string():
     use_managed_identity = os.getenv("USE_MANAGED_IDENTITY", "false").lower() == "true"
     
     if use_managed_identity:
-        # Use Managed Identity with ODBC Driver 18 - explicitly disable Integrated Security
-        connection_string = f"mssql+pyodbc://@{server}/{database}?driver=ODBC+Driver+18+for+SQL+Server&Authentication=ActiveDirectoryMsi&Integrated+Security=no&Encrypt=yes&TrustServerCertificate=no&Connection+Timeout=30"
+        # Use Managed Identity with ODBC Driver 18 - remove Integrated Security completely
+        connection_string = f"mssql+pyodbc://@{server}/{database}?driver=ODBC+Driver+18+for+SQL+Server&Authentication=ActiveDirectoryMsi&Encrypt=yes&TrustServerCertificate=no&Connection+Timeout=30"
     else:
-        # Use username/password with ODBC Driver 18
+        # Use username/password with ODBC Driver 18 
         username = os.getenv("AZURE_SQL_USERNAME")
         password = os.getenv("AZURE_SQL_PASSWORD")
         connection_string = f"mssql+pyodbc://{username}:{password}@{server}/{database}?driver=ODBC+Driver+18+for+SQL+Server&Encrypt=yes&TrustServerCertificate=no&Connection+Timeout=30"

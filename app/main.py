@@ -2,6 +2,7 @@ from fastapi import FastAPI, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from datetime import datetime
 from typing import Optional, List
+import random
 from . import models, schemas, crud
 from .database import SessionLocal, engine, Base, test_connection
 
@@ -155,6 +156,51 @@ async def get_trades_by_trader(
         return trades
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Failed to retrieve trader trades: {str(e)}")
+
+# Market Data Endpoints (no database required - generates mock data)
+@app.get("/market-data/current", summary="Get current market data")
+async def get_current_market_data():
+    """Get current market data for energy commodities (simulated)"""
+    commodities = ['electricity', 'oil', 'gas', 'coal', 'natural_gas', 'renewable']
+    
+    market_data = []
+    for commodity in commodities:
+        # Generate realistic price ranges
+        if commodity == 'electricity':
+            base_price = 75.0
+            variation = 25.0
+        elif commodity == 'oil':
+            base_price = 80.0
+            variation = 20.0
+        elif commodity in ['gas', 'natural_gas']:
+            base_price = 4.5
+            variation = 1.5
+        elif commodity == 'coal':
+            base_price = 60.0
+            variation = 15.0
+        else:  # renewable
+            base_price = 65.0
+            variation = 20.0
+        
+        current_price = round(base_price + random.uniform(-variation, variation), 2)
+        change = round(random.uniform(-5.0, 5.0), 2)
+        
+        market_data.append({
+            "commodity": commodity,
+            "current_price": current_price,
+            "change_24h": change,
+            "change_percent": round((change / base_price) * 100, 2),
+            "timestamp": datetime.utcnow().isoformat(),
+            "volume_24h": random.randint(1000, 50000),
+            "high_24h": round(current_price + abs(change) + random.uniform(0, 5), 2),
+            "low_24h": round(current_price - abs(change) - random.uniform(0, 5), 2)
+        })
+    
+    return {
+        "status": "success",
+        "timestamp": datetime.utcnow().isoformat(),
+        "market_data": market_data
+    }
 
 if __name__ == "__main__":
     import uvicorn
