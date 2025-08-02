@@ -37,7 +37,44 @@ app = FastAPI(
     3. **Market Data**: Use `GET /market-data/current` for live market information
     4. **Specific Lookups**: Use ID-based endpoints to get individual trades or filter by commodity/trader
     
-    ### 📊 **Supported Commodities:**
+    ---
+    
+    ## 🎲 **Dynamic Testing Made Easy!**
+    
+    ### **1. 🔄 Dynamic Examples Endpoint**
+    **NEW**: `/examples/dynamic` endpoint that provides fresh examples on every request:
+    
+    **This endpoint gives you:**
+    - ✅ **Fresh trade IDs, commodities, and traders** on each call
+    - ✅ **Ready-to-use test URLs** with dynamic values
+    - ✅ **Sample trade data** for POST requests
+    - ✅ **Different values every time** you refresh
+    
+    ### **2. 📝 Enhanced Static Examples**
+    The main `/docs` page now has **better examples** with:
+    - Multiple example variations for POST requests
+    - Realistic parameter examples
+    - Better descriptions
+    
+    ### **3. 🎯 How to Use Dynamic Examples:**
+    1. **Visit the dynamic examples endpoint**: `/examples/dynamic`
+    2. **Copy the fresh values** from the response
+    3. **Use them in other endpoints** or in the `/docs` "Try it out" forms
+    4. **Refresh for new examples** anytime
+    
+    ### **4. � Example Workflow:**
+    1. Call `/examples/dynamic` → Get random trade ID `15`
+    2. Use `/trades/15` → Test with that specific trade
+    3. Refresh `/examples/dynamic` → Get new random commodity `oil`
+    4. Use `/trades/commodity/oil` → Test with that commodity
+    
+    ### **⚡ Result:**
+    While the main `/docs` page examples are set at server startup, you now have a **"Dynamic Examples Generator"** 
+    that provides fresh, realistic test data every time you need it!
+    
+    ---
+    
+    ### �📊 **Supported Commodities:**
     - `electricity` - Electric power trading ($/MWh)
     - `oil` - Crude oil trading ($/barrel)
     - `gas` / `natural_gas` - Natural gas trading ($/MMBtu)
@@ -51,10 +88,11 @@ app = FastAPI(
     - `fossil_fuel_ltd` - Traditional energy company
     
     ### 🔧 **Quick Start:**
-    1. Check market data: `GET /market-data/current`
-    2. View existing trades: `GET /trades/`
-    3. Create your first trade: `POST /trades/`
-    4. Try the interactive "Try it out" buttons below!
+    1. **Get fresh examples**: `GET /examples/dynamic`
+    2. **Check market data**: `GET /market-data/current`
+    3. **View existing trades**: `GET /trades/`
+    4. **Create your first trade**: `POST /trades/`
+    5. **Try the interactive "Try it out" buttons** with dynamic values!
     """,
     version="1.0.0",
     docs_url="/docs",
@@ -99,27 +137,42 @@ async def read_root():
     
     This endpoint provides basic information about the API and quick links to get started.
     
+    ## 🎲 **NEW: Dynamic Testing Feature!**
+    **🔥 Hot Tip**: Use `/examples/dynamic` to get fresh, realistic test data that changes every time!
+    - Get random trade IDs, commodities, and traders
+    - Copy values directly into other endpoints
+    - Ready-to-use test URLs provided
+    - **Perfect for testing without guessing valid values!**
+    
     **Next Steps:**
-    - 📖 **API Documentation**: Visit `/docs` for interactive API documentation
+    - 🎲 **Dynamic Examples**: Try `/examples/dynamic` for fresh test data
+    - 📖 **API Documentation**: Visit `/docs` for interactive API documentation  
     - 📊 **Market Data**: Try `/market-data/current` to see live market prices
     - 💼 **View Trades**: Use `/trades/` to see existing trades
     
     **Test URLs:**
+    - Dynamic Examples: https://fastapi-energy-trading-g2a9h8bdhzchh7fa.westeurope-01.azurewebsites.net/examples/dynamic
     - Market Data: https://fastapi-energy-trading-g2a9h8bdhzchh7fa.westeurope-01.azurewebsites.net/market-data/current
     - All Trades: https://fastapi-energy-trading-g2a9h8bdhzchh7fa.westeurope-01.azurewebsites.net/trades/
     """
     return {
         "message": "🔋 Energy Trading Platform API",
-        "version": "1.0.0",
+        "version": "1.0.0", 
         "description": "REST API for energy commodity trading",
+        "🔥 new_feature": {
+            "dynamic_examples": "/examples/dynamic",
+            "description": "Get fresh test data that changes every time!"
+        },
         "quick_links": {
+            "dynamic_examples": "/examples/dynamic",
             "documentation": "/docs",
-            "market_data": "/market-data/current",
+            "market_data": "/market-data/current", 
             "all_trades": "/trades/",
             "health_check": "/health"
         },
         "supported_commodities": ["electricity", "oil", "gas", "natural_gas", "coal", "renewable"],
-        "example_traders": ["trader_001", "trader_002", "energy_corp", "green_power"]
+        "example_traders": ["trader_001", "trader_002", "energy_corp", "green_power"],
+        "💡 testing_tip": "Use /examples/dynamic to get realistic values for testing other endpoints!"
     }
 
 @app.get("/health", response_model=schemas.HealthCheck, summary="🏥 Health Check", tags=["General"])
@@ -445,50 +498,135 @@ async def get_current_market_data():
     }
 
 # Dynamic Examples Endpoint
-@app.get("/examples/dynamic", summary="🎲 Get Dynamic Examples", tags=["Examples"])
+@app.get("/examples/dynamic", summary="🎲 Dynamic Examples Generator", tags=["🎯 Testing Tools"])
 async def get_dynamic_examples():
     """
-    **Get fresh dynamic examples for testing endpoints**
+    ## 🔄 **Dynamic Examples Generator - Your Testing Best Friend!**
     
-    This endpoint provides randomized, valid examples that change on each request.
-    Use these values to test other endpoints with realistic data.
+    **Get fresh, realistic examples that change every time you call this endpoint.**
     
-    **🎯 What You Get:**
-    - Random trade ID from existing trades
-    - Random commodity from available types
-    - Random trader from active traders
-    - Random trade side (buy/sell)
-    - Fresh pricing data
+    ### 🎯 **What This Does:**
+    This endpoint provides **fresh examples on every request** to help you test all the other API endpoints 
+    with realistic, valid data.
     
-    **💡 Usage:**
-    1. Call this endpoint to get fresh examples
-    2. Copy the values to test other endpoints
-    3. Refresh this endpoint for new examples
+    ### ✅ **What You Get:**
+    - 🆔 **Fresh trade IDs** from existing trades in the database
+    - ⚡ **Random commodities** from available energy types
+    - 👤 **Random traders** from active trader accounts
+    - 💱 **Random trade sides** (buy/sell)
+    - 💰 **Realistic pricing data** based on commodity types
+    - 🔗 **Ready-to-use test URLs** with the dynamic values
     
-    **🔄 Updates:** Values change on every request
+    ### 🚀 **How to Use This:**
+    
+    #### **Method 1: Copy & Paste Values**
+    1. **Call this endpoint** (click "Try it out" → "Execute")
+    2. **Copy values** from the response (trade_id, commodity, trader_id, etc.)
+    3. **Paste them** into other endpoint parameters
+    4. **Test away!**
+    
+    #### **Method 2: Use the Ready-Made URLs**
+    1. **Look at the `test_urls` section** in the response
+    2. **Copy any URL** and paste it into your browser or API client
+    3. **Instant testing** with valid data!
+    
+    ### 🔧 **Example Workflow:**
+    ```
+    Step 1: Call /examples/dynamic
+    Response: {"examples": {"trade_id": 15, "commodity": "oil", ...}}
+    
+    Step 2: Use the values
+    - Test specific trade: GET /trades/15
+    - Test commodity: GET /trades/commodity/oil
+    - Create new trade with sample_trade data
+    
+    Step 3: Need different values?
+    - Refresh this endpoint for new random values!
+    ```
+    
+    ### 💡 **Pro Tips:**
+    - **Bookmark this endpoint** for quick access to test data
+    - **Refresh multiple times** to get different combinations
+    - **Use sample_trade object** for POST /trades/ testing
+    - **Copy test_urls** for instant endpoint testing
+    
+    ### 🔄 **Dynamic Updates:**
+    - **Trade IDs**: Random from 1-25 (existing trade range)
+    - **Commodities**: Rotates through all 6 energy types
+    - **Traders**: Cycles through all 6 trader accounts
+    - **Prices**: Realistic ranges based on commodity type
+    - **Test URLs**: Generated with fresh values each time
+    
+    **💫 This endpoint updates every single time you call it - try it multiple times!**
     """
     random_commodity = get_random_commodity()
+    random_trader = get_random_trader()
+    random_trade_id = get_random_trade_id()
+    random_side = random.choice(['buy', 'sell'])
+    
+    # Generate realistic price based on commodity
+    price_ranges = {
+        'electricity': (50, 150),
+        'oil': (60, 100), 
+        'gas': (2, 8),
+        'natural_gas': (2, 8),
+        'coal': (40, 80),
+        'renewable': (30, 120)
+    }
+    min_price, max_price = price_ranges.get(random_commodity, (50, 100))
+    random_price = round(random.uniform(min_price, max_price), 2)
+    
+    # Generate realistic quantity based on commodity
+    quantity_ranges = {
+        'electricity': (10, 1000),
+        'oil': (100, 10000),
+        'gas': (1000, 50000), 
+        'natural_gas': (1000, 50000),
+        'coal': (500, 5000),
+        'renewable': (50, 2000)
+    }
+    min_qty, max_qty = quantity_ranges.get(random_commodity, (100, 1000))
+    random_quantity = round(random.uniform(min_qty, max_qty), 2)
     
     return {
-        "timestamp": datetime.utcnow().isoformat(),
+        "🎲 status": "Fresh examples generated!",
+        "⏰ timestamp": datetime.utcnow().isoformat(),
+        "🔄 refresh_note": "Call this endpoint again for different values!",
+        
         "examples": {
-            "trade_id": get_random_trade_id(),
+            "trade_id": random_trade_id,
             "commodity": random_commodity,
-            "trader_id": get_random_trader(),
-            "side": random.choice(['buy', 'sell']),
-            "sample_trade": {
+            "trader_id": random_trader,
+            "side": random_side,
+            "sample_trade_for_POST": {
                 "commodity": random_commodity,
-                "price": round(random.uniform(50, 120), 2),
-                "quantity": round(random.uniform(100, 2000), 2),
-                "side": random.choice(['buy', 'sell']),
-                "trader_id": get_random_trader()
+                "price": random_price,
+                "quantity": random_quantity,
+                "side": random_side,
+                "trader_id": random_trader
             }
         },
-        "test_urls": {
-            "get_trade_by_id": f"https://fastapi-energy-trading-g2a9h8bdhzchh7fa.westeurope-01.azurewebsites.net/trades/{get_random_trade_id()}",
-            "get_by_commodity": f"https://fastapi-energy-trading-g2a9h8bdhzchh7fa.westeurope-01.azurewebsites.net/trades/commodity/{get_random_commodity()}",
-            "get_by_trader": f"https://fastapi-energy-trading-g2a9h8bdhzchh7fa.westeurope-01.azurewebsites.net/trades/trader/{get_random_trader()}",
-            "filtered_trades": f"https://fastapi-energy-trading-g2a9h8bdhzchh7fa.westeurope-01.azurewebsites.net/trades/?commodity={get_random_commodity()}&side={random.choice(['buy', 'sell'])}"
+        
+        "🔗 ready_to_use_test_urls": {
+            "get_specific_trade": f"https://fastapi-energy-trading-g2a9h8bdhzchh7fa.westeurope-01.azurewebsites.net/trades/{random_trade_id}",
+            "get_by_commodity": f"https://fastapi-energy-trading-g2a9h8bdhzchh7fa.westeurope-01.azurewebsites.net/trades/commodity/{random_commodity}",
+            "get_by_trader": f"https://fastapi-energy-trading-g2a9h8bdhzchh7fa.westeurope-01.azurewebsites.net/trades/trader/{random_trader}",
+            "filtered_trades": f"https://fastapi-energy-trading-g2a9h8bdhzchh7fa.westeurope-01.azurewebsites.net/trades/?commodity={random_commodity}&side={random_side}",
+            "get_fresh_examples": "https://fastapi-energy-trading-g2a9h8bdhzchh7fa.westeurope-01.azurewebsites.net/examples/dynamic"
+        },
+        
+        "💡 instructions": {
+            "step_1": "Copy values from 'examples' section above",
+            "step_2": "Paste them into other endpoint parameters in /docs",
+            "step_3": "Or copy/paste any URL from 'ready_to_use_test_urls'",
+            "step_4": "Refresh this endpoint anytime for new values!"
+        },
+        
+        "🎯 available_values": {
+            "commodities": ["electricity", "oil", "gas", "natural_gas", "coal", "renewable"],
+            "traders": ["trader_001", "trader_002", "trader_003", "energy_corp", "green_power", "fossil_fuel_ltd"],
+            "sides": ["buy", "sell"],
+            "trade_id_range": "1-25 (existing trades)"
         }
     }
 
