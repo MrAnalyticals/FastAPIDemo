@@ -35,50 +35,26 @@ def get_access_token():
         print(f"Failed to get access token: {e}")
         raise
 
-def create_connection_string():
-    """Create appropriate connection string based on authentication method"""
-    
-    # Check for direct DATABASE_URL first (highest priority)
-    database_url = os.getenv("DATABASE_URL")
-    if database_url:
-        print("Using direct DATABASE_URL connection string")
-        return database_url, None
+def get_connection_string():
+    server = os.getenv("AZURE_SQL_SERVER")
+    database = os.getenv("AZURE_SQL_DATABASE")
+    use_managed_identity = os.getenv("USE_MANAGED_IDENTITY", "false").lower() == "true"
     
     if use_managed_identity:
-        # Managed Identity authentication
-        print("Using Azure Managed Identity for database authentication")
-        
-        # Get access token
-        access_token = get_access_token()
-        
-        # Create connection string with access token (no authentication parameter)
-        connection_string = (
-            f"mssql+pyodbc://@{server}/{database}"
-            "?driver=ODBC+Driver+17+for+SQL+Server"
-        )
-        
-        # We'll set the access token in the connection event
-        return connection_string, access_token
+        # Use Managed Identity with access token - NO Authentication parameter
+        connection_string = f"mssql+pyodbc://@{server}/{database}?driver=ODBC+Driver+17+for+SQL+Server"
     else:
-        # SQL Authentication (for local development)
-        print("Using SQL Authentication for database connection")
+        # Use username/password - NO Access Token
         username = os.getenv("AZURE_SQL_USERNAME")
         password = os.getenv("AZURE_SQL_PASSWORD")
-        
-        if not username or not password:
-            raise ValueError("Database credentials not found. Set AZURE_SQL_USERNAME and AZURE_SQL_PASSWORD environment variables.")
-        
-        connection_string = (
-            f"mssql+pyodbc://{username}:{password}@{server}/{database}"
-            "?driver=ODBC+Driver+17+for+SQL+Server"
-        )
-        
-        return connection_string, None
+        connection_string = f"mssql+pyodbc://{username}:{password}@{server}/{database}?driver=ODBC+Driver+17+for+SQL+Server"
+    
+    return connection_string
 
 def create_database_engine():
     """Create SQLAlchemy engine with appropriate authentication"""
     
-    connection_string, access_token = create_connection_string()
+    connection_string = get_connection_string()
     
     # Create engine with retry settings for serverless databases
     engine = create_engine(
@@ -91,7 +67,7 @@ def create_database_engine():
         }
     )
     
-    if use_managed_identity and access_token:
+    if use_managed_identity:
         # Set up event listener to inject access token for managed identity connections
         @event.listens_for(engine, "do_connect")
         def provide_token(dialect, conn_rec, cargs, cparams):
@@ -141,6 +117,7 @@ def test_connection():
                 return False
     
     return False
+
 
 if __name__ == "__main__":
     # Test connection when running this file directly
