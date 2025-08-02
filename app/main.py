@@ -1,10 +1,20 @@
-from fastapi import FastAPI, Depends, HTTPException, Query
+from fastapi import FastAPI, Depends, HTTPException, Query, Path
 from sqlalchemy.orm import Session
 from datetime import datetime
 from typing import Optional, List
 import random
 from . import models, schemas, crud
 from .database import SessionLocal, engine, Base, test_connection
+
+# Dynamic example functions
+def get_random_trade_id():
+    return random.randint(1, 25)
+
+def get_random_commodity():
+    return random.choice(['electricity', 'oil', 'gas', 'coal', 'natural_gas', 'renewable'])
+
+def get_random_trader():
+    return random.choice(['trader_001', 'trader_002', 'trader_003', 'energy_corp', 'green_power', 'fossil_fuel_ltd'])
 
 # Initialize FastAPI app
 app = FastAPI(
@@ -185,9 +195,9 @@ async def create_trade(trade: schemas.TradeCreate, db: Session = Depends(get_db)
 async def get_trades(
     limit: int = Query(100, ge=1, le=1000, description="Maximum number of trades to return (1-1000)"),
     offset: int = Query(0, ge=0, description="Number of trades to skip for pagination"),
-    commodity: Optional[str] = Query(None, description="Filter by commodity type (electricity, oil, gas, etc.)"),
-    trader_id: Optional[str] = Query(None, description="Filter by specific trader ID"),
-    side: Optional[str] = Query(None, description="Filter by trade side (buy/sell)"),
+    commodity: Optional[str] = Query(None, description="Filter by commodity type", example=get_random_commodity()),
+    trader_id: Optional[str] = Query(None, description="Filter by specific trader ID", example=get_random_trader()),
+    side: Optional[str] = Query(None, description="Filter by trade side (buy/sell)", example=random.choice(['buy', 'sell'])),
     db: Session = Depends(get_db)
 ):
     """
@@ -241,7 +251,10 @@ async def get_trades(
         raise HTTPException(status_code=400, detail=f"Failed to retrieve trades: {str(e)}")
 
 @app.get("/trades/{trade_id}", response_model=schemas.Trade, summary="🔍 Get Trade by ID", tags=["Trading"])
-async def get_trade(trade_id: int, db: Session = Depends(get_db)):
+async def get_trade(
+    trade_id: int = Path(..., description="Trade ID to retrieve", example=get_random_trade_id()),
+    db: Session = Depends(get_db)
+):
     """
     **Get a specific trade by its unique ID**
     
@@ -270,7 +283,7 @@ async def get_trade(trade_id: int, db: Session = Depends(get_db)):
 
 @app.get("/trades/commodity/{commodity}", response_model=List[schemas.Trade], summary="⚡ Get Trades by Commodity", tags=["Trading"])
 async def get_trades_by_commodity(
-    commodity: str,
+    commodity: str = Path(..., description="Energy commodity type", example=get_random_commodity()),
     limit: int = Query(10, ge=1, le=100, description="Maximum number of trades to return (1-100)"),
     db: Session = Depends(get_db)
 ):
@@ -309,7 +322,7 @@ async def get_trades_by_commodity(
 
 @app.get("/trades/trader/{trader_id}", response_model=List[schemas.Trade], summary="👤 Get Trades by Trader", tags=["Trading"])
 async def get_trades_by_trader(
-    trader_id: str,
+    trader_id: str = Path(..., description="Trader identification", example=get_random_trader()),
     limit: int = Query(50, ge=1, le=200, description="Maximum number of trades to return (1-200)"),
     db: Session = Depends(get_db)
 ):
@@ -429,6 +442,54 @@ async def get_current_market_data():
         "status": "success",
         "timestamp": datetime.utcnow().isoformat(),
         "market_data": market_data
+    }
+
+# Dynamic Examples Endpoint
+@app.get("/examples/dynamic", summary="🎲 Get Dynamic Examples", tags=["Examples"])
+async def get_dynamic_examples():
+    """
+    **Get fresh dynamic examples for testing endpoints**
+    
+    This endpoint provides randomized, valid examples that change on each request.
+    Use these values to test other endpoints with realistic data.
+    
+    **🎯 What You Get:**
+    - Random trade ID from existing trades
+    - Random commodity from available types
+    - Random trader from active traders
+    - Random trade side (buy/sell)
+    - Fresh pricing data
+    
+    **💡 Usage:**
+    1. Call this endpoint to get fresh examples
+    2. Copy the values to test other endpoints
+    3. Refresh this endpoint for new examples
+    
+    **🔄 Updates:** Values change on every request
+    """
+    random_commodity = get_random_commodity()
+    
+    return {
+        "timestamp": datetime.utcnow().isoformat(),
+        "examples": {
+            "trade_id": get_random_trade_id(),
+            "commodity": random_commodity,
+            "trader_id": get_random_trader(),
+            "side": random.choice(['buy', 'sell']),
+            "sample_trade": {
+                "commodity": random_commodity,
+                "price": round(random.uniform(50, 120), 2),
+                "quantity": round(random.uniform(100, 2000), 2),
+                "side": random.choice(['buy', 'sell']),
+                "trader_id": get_random_trader()
+            }
+        },
+        "test_urls": {
+            "get_trade_by_id": f"https://fastapi-energy-trading-g2a9h8bdhzchh7fa.westeurope-01.azurewebsites.net/trades/{get_random_trade_id()}",
+            "get_by_commodity": f"https://fastapi-energy-trading-g2a9h8bdhzchh7fa.westeurope-01.azurewebsites.net/trades/commodity/{get_random_commodity()}",
+            "get_by_trader": f"https://fastapi-energy-trading-g2a9h8bdhzchh7fa.westeurope-01.azurewebsites.net/trades/trader/{get_random_trader()}",
+            "filtered_trades": f"https://fastapi-energy-trading-g2a9h8bdhzchh7fa.westeurope-01.azurewebsites.net/trades/?commodity={get_random_commodity()}&side={random.choice(['buy', 'sell'])}"
+        }
     }
 
 if __name__ == "__main__":
