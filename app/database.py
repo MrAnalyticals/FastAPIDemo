@@ -1,10 +1,9 @@
 import os
 import time
-from sqlalchemy import create_engine, event
+from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
 from azure.identity import DefaultAzureCredential, ManagedIdentityCredential
 import pyodbc
-import struct
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -41,8 +40,8 @@ def get_connection_string():
     use_managed_identity = os.getenv("USE_MANAGED_IDENTITY", "false").lower() == "true"
     
     if use_managed_identity:
-        # Use Managed Identity with access token - NO Authentication parameter
-        connection_string = f"mssql+pyodbc://@{server}/{database}?driver=ODBC+Driver+17+for+SQL+Server"
+        # Use Managed Identity with ActiveDirectoryMsi authentication
+        connection_string = f"mssql+pyodbc://@{server}/{database}?driver=ODBC+Driver+17+for+SQL+Server&Authentication=ActiveDirectoryMsi"
     else:
         # Use username/password - NO Access Token
         username = os.getenv("AZURE_SQL_USERNAME")
@@ -67,19 +66,7 @@ def create_database_engine():
         }
     )
     
-    if use_managed_identity:
-        # Set up event listener to inject access token for managed identity connections
-        @event.listens_for(engine, "do_connect")
-        def provide_token(dialect, conn_rec, cargs, cparams):
-            # Get fresh token for each connection
-            token = get_access_token()
-            
-            # Convert token to bytes and create token struct
-            token_bytes = token.encode("utf-16-le")
-            token_struct = struct.pack(f"<I{len(token_bytes)}s", len(token_bytes), token_bytes)
-            
-            # Set the token in connection attributes
-            cparams["attrs_before"] = {1256: token_struct}  # SQL_COPT_SS_ACCESS_TOKEN
+    # Remove the event listener - let ActiveDirectoryMsi handle authentication
     
     return engine
 
@@ -117,6 +104,7 @@ def test_connection():
                 return False
     
     return False
+
 
 
 if __name__ == "__main__":
